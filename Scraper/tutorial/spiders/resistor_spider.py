@@ -18,7 +18,4 @@ class ResistorSpider(scrapy.Spider):
             }
         next_page = response.css('a.action.next::attr(href)').get()
         if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
-
-            
+            yield response.follow(next_page, callback=self.parse)

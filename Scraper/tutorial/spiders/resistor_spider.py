@@ -17,5 +17,7 @@ class ResistorSpider(scrapy.Spider):
                 'Resistance' : resistor.css("a.product-item-link::text").get().strip().split(' ')[0],
             }
         next_page = response.css('a.action.next::attr(href)').get()
+        
         if next_page is not None:
             yield response.follow(next_page, callback=self.parse)
+            

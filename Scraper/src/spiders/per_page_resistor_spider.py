@@ -1,4 +1,4 @@
-from re import S
+import re
 import scrapy 
 
 
@@ -15,24 +15,42 @@ class AvResistorSpider(scrapy.Spider):
         yield from response.follow_all(resistor_page_links, self.parse_resistor)
 
 
-        pagination_links = response.css('a.action.next::attr(href)').get()
-        yield from response.follow_all(pagination_links, callback=self.parse)
+        #pagination_links = response.css('a.action.next::attr(href)')
+        #yield from response.follow_all(pagination_links, callback=self.parse)
 
     def parse_resistor(self, response):
         yield {
             'Part Name' : response.css("span.base::text").get(),
+            'Part Number' : AvResistorSpider.parse_info(self, response)[0],
+            'Resistance' : AvResistorSpider.parse_info(self, response)[2],
+            'Manufacturer' : 'Royal OHM',
+            'Overall Length': '52mm', 
+            'Power(Watts)': '0.25W',
+            'Tolerance' : '1%',
+            'Resistor Type' : 'Metal Film',
+            'Case/Package' : 'Axial',
+            
         }
 
+    def parse_info(self, response):
+        info = response.xpath('//*[@id="maincontent"]/div[2]/div[1]/div[4]/div/div[2]/center//text()').extract()
+        rep =[]
+        out = ["NULL","NULL","NULL",]
 
-        
-        # for resistor in response.css("div.product-item-info"):
-        #     yield {
-        #         'Part Name' : resistor.css("a.product-item-link::text").get().strip(),
-        #         'Price' : resistor.css("span.price::text").get(),
-        #         'Supplier Link' : resistor.css("a.product-item-link::attr(href)").get(),
-        #         'Supplier Part Number' : resistor.css("div.product.sku-qty.product-item-sku-qty::text").get().strip().replace(" ","").replace("\n","").replace("|",":").split(':')[1],
-        #         'Resistance' : resistor.css("a.product-item-link::text").get().strip().split(' ')[0],
-        #     }
-        # next_page = response.css('a.action.next::attr(href)').get()
-        # if next_page is not None:
-        #     yield response.follow(next_page, callback=self.parse)
+        for i in info:
+            rep.append(i.strip())
+
+        for i in rep:
+            if re.search("MF............*", i):
+                out[0] = re.split("MF............",i)
+            elif i == 'Manufacturer: Royal OHM':
+                out[1] = "Royal OHM"
+            elif re.search("^Resistan", i):
+                out[2] =re.split("\d+.?", i)
+        return(out)
+
+
+            
+
+
+

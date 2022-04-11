@@ -12,7 +12,7 @@ def parse_info(info):
         elif i == 'Manufacturer: Royal OHM':
             out[1] = "Royal OHM"
         elif re.search(r"^Resistan", i):
-            out[2] =re.search(r"\d+.?", i)
+            out[2] =re.search(r"\d+.?", i).group()
 
 
 

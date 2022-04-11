@@ -15,15 +15,17 @@ class AvResistorSpider(scrapy.Spider):
         yield from response.follow_all(resistor_page_links, self.parse_resistor)
 
 
-        #pagination_links = response.css('a.action.next::attr(href)')
-        #yield from response.follow_all(pagination_links, callback=self.parse)
+        pagination_links = response.css('a.action.next::attr(href)')
+        yield from response.follow_all(pagination_links, callback=self.parse)
 
     def parse_resistor(self, response):
         yield {
             'Part Name' : response.css("span.base::text").get(),
-            'Part Number' : AvResistorSpider.parse_info(self, response)[0],
-            'Resistance' : AvResistorSpider.parse_info(self, response)[2],
+            'Manufacturer Part Number' : AvResistorSpider.parse_info(self, response)[0],
+            'Resistance' : AvResistorSpider.parse_info(self, response)[2] + "R", 
             'Manufacturer' : 'Royal OHM',
+            'Supplier 1' : 'Tayda Electronics',
+            'Supplier Part Number' : response.css("td.col.data::text").get(),
             'Overall Length': '52mm', 
             'Power(Watts)': '0.25W',
             'Tolerance' : '1%',
@@ -42,11 +44,11 @@ class AvResistorSpider(scrapy.Spider):
 
         for i in rep:
             if re.search("MF............*", i):
-                out[0] = re.split("MF............",i)
+                out[0] = re.search("MF............",i).group()
             elif i == 'Manufacturer: Royal OHM':
                 out[1] = "Royal OHM"
             elif re.search("^Resistan", i):
-                out[2] =re.split("\d+.?", i)
+                out[2] =re.search("[.?\d]+[K|M]?", i).group()
         return(out)
 
 

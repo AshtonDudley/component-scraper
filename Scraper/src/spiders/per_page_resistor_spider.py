@@ -4,7 +4,6 @@ import scrapy
 
 class AvResistorSpider(scrapy.Spider):
     name = "av_resistor"
-
     
     start_urls = ['https://www.taydaelectronics.com/resistors/1-4w-metal-film-resistors.html']
         
@@ -21,16 +20,23 @@ class AvResistorSpider(scrapy.Spider):
     def parse_resistor(self, response):
         yield {
             'Part Name' : response.css("span.base::text").get(),
-            'Manufacturer Part Number' : AvResistorSpider.parse_info(self, response)[0],
+            'Description' : response.css("span.base::text").get(),
+            'Manufacturer Part' : AvResistorSpider.parse_info(self, response)[0],
             'Resistance' : AvResistorSpider.parse_info(self, response)[2] + "R", 
             'Manufacturer' : 'Royal OHM',
             'Supplier 1' : 'Tayda Electronics',
-            'Supplier Part Number' : response.css("td.col.data::text").get(),
-            'Overall Length': '52mm', 
-            'Power(Watts)': '0.25W',
+            'Supplier Part Number 1' : response.css("td.col.data::text").get(),
+            'Length': '52mm', 
+            'Voltage Rating (DC)': '0.25W',
             'Tolerance' : '1%',
             'Resistor Type' : 'Metal Film',
             'Case/Package' : 'Axial',
+            'Category' : 'Through-Hole Resistor',
+            'Library Ref' : 'Resistor',
+            'Library Path' : 'Symbols\Resistors.SchLib',
+            'Footprint Path' : 'Footprints\Resistors.PcbLib',
+            'Footprint Ref' : '6.8MM.9',
+            'Comment' : AvResistorSpider.parse_info(self, response)[2],
             
         }
 
